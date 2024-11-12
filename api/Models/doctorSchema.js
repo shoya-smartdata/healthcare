@@ -23,6 +23,14 @@ const Doctor = sequelize.define('Doctor', {
   },
   availability: {
     type: DataTypes.STRING,
+  },
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false // Default to false when registering
+  },
+  verificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true // Token will be set when generating verification email
   }
 });
 

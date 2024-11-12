@@ -16,6 +16,14 @@ const Patient = sequelize.define('Patient', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false // Default to false when registering
+  },
+  verificationToken: {
+    type: DataTypes.STRING,
+    allowNull: true // Token will be set when generating verification email
+  }
 });
 
 export default Patient;

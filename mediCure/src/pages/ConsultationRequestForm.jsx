@@ -40,7 +40,7 @@ const ConsultationRequestForm = ({ doctorId, onClose }) => {
   
       setSuccess('Consultation request submitted successfully!');
       setError('');
-      onClose(); // Close the form after submission
+      onClose();
     } catch (err) {
       setError('Failed to request consultation. Please try again.');
       console.error(err);

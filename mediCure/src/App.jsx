@@ -8,6 +8,7 @@ import Home from './components/Home';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import VerifyEmailSuccess from './pages/VerifyEmailSuccess';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify" element={<VerifyEmailSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
         <Footer />

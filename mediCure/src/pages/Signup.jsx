@@ -1,4 +1,3 @@
-// pages/Signup.js
 import axios from 'axios';
 import React, { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
@@ -18,7 +17,7 @@ const Signup = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await axios.post('http://localhost:3030/api/auth/register', form, {
         headers: {
@@ -30,13 +29,16 @@ const Signup = () => {
       toast.success('User registered successfully!');
 
       console.log('User registered successfully:', response.data);
-      // Optionally, you can reset the form or redirect the user here
-      navigate('/login')
+
+      // Assuming the backend returns a token on successful registration (as shown in backend code)
+      if (response.data.token) {
+        // Redirect to the verification page with the token
+        navigate(`/verify-email-success?token=${response.data.token}`);
+      }
     } catch (error) {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
 
-    
-      toast.error("unable to register");
+      toast.error("Unable to register");
     }
   };
 
