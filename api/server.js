@@ -1,6 +1,5 @@
 import express from 'express';
 import sequelize from './config/db.js';
-
 import authRoutes from './Routes/authRoutes.js';
 import patientRoutes from './Routes/patientRoutes.js';
 import doctorRoutes from './Routes/docterRoutes.js';

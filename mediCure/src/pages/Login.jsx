@@ -11,28 +11,32 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();  // Prevent form refresh
-
+  
     try {
       const response = await axios.post("http://localhost:3030/api/auth/login", form, {
         headers: {
           'Content-Type': 'application/json',
         },
       });
-      
+  
       console.log("Successfully logged in", response.data);
-
+  
+      // Save token and role in localStorage
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('role', form.role); // Store the role (patient/doctor)
+  
       toast.success("Successfully logged in!");
-
-      // Navigate to dashboard or another page after successful login
-      navigate('/dashboard');  // Change this to your preferred route
+  
+      // Redirect to dashboard
+      navigate('/dashboard'); 
     } catch (error) {
       console.error("Login failed", error.response ? error.response.data : error.message);
-      
+  
       // Show error toast if login fails
       toast.error("Login failed. Please check your credentials.");
     }
   };
-
+  
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
