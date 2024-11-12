@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await axios.get('http://localhost:3030/api/patient/doctors');
+        const response = await axios.get('http://localhost:3031/api/patient/doctors');
         setDoctors(response.data.data);
         console.log(response.data.data);
         

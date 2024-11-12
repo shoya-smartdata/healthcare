@@ -19,22 +19,17 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3030/api/auth/register', form, {
+      const response = await axios.post('http://localhost:3031/api/auth/register', form, {
         headers: {
           'Content-Type': 'application/json', // Sending as JSON
         },
       });
-
-      // Show success toast on successful registration
       toast.success('User registered successfully!');
+      navigate('/verify-mail');
 
       console.log('User registered successfully:', response.data);
 
-      // Assuming the backend returns a token on successful registration (as shown in backend code)
-      if (response.data.token) {
-        // Redirect to the verification page with the token
-        navigate(`/verify-email-success?token=${response.data.token}`);
-      }
+    
     } catch (error) {
       console.error('Error registering user:', error.response ? error.response.data : error.message);
 

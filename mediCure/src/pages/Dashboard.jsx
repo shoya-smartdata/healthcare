@@ -15,7 +15,7 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedConsultationId, setSelectedConsultationId] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [availability, setAvailability] = useState(''); //rest
+  const [availability, setAvailability] = useState(''); // Rest
 
   useEffect(() => {
     console.log('Current role:', role);
@@ -31,7 +31,7 @@ const Dashboard = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3030/api/doctor/requests', {
+      const response = await axios.get('http://localhost:3031/api/doctor/requests', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -51,7 +51,7 @@ const Dashboard = () => {
     try {
       const token = localStorage.getItem('token');
     
-      const response = await axios.get('http://localhost:3030/api/patient/allConstultant', {
+      const response = await axios.get('http://localhost:3031/api/patient/allConstultant', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -80,7 +80,7 @@ const Dashboard = () => {
   const handleUpdateStatus = async (consultationId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:3030/api/doctor/consultation/status', {
+      await axios.put('http://localhost:3031/api/doctor/consultation/status', {
         consultationId,
         status: newStatus,
       }, {
@@ -102,30 +102,17 @@ const Dashboard = () => {
     }
   };
 
-
-  const doctorAvailability = async(req, res)=>{
-    
-try {
-    const response = await axios.put('http://localhost:3030/api/doctor/availability', availability);
-    setAvailability(response);
-} catch (error) {
-  
-}    
-  }
-
-  console.log("hello",consultations);
-  
+  console.log("hello", consultations);
 
   return (
     <>
       <div className="container mx-auto p-4">
-        <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+        <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
         {/* Conditional rendering based on role */}
         {role === 'patient' ? (
-          
           <div>
-            <h2 className="text-2xl font-bold mb-4">Your Consultation Requests !</h2>
+            <h2 className="text-2xl font-bold mb-4">Your Consultation Requests</h2>
             {loading ? (
               <p>Loading...</p>
             ) : error ? (
@@ -133,13 +120,12 @@ try {
             ) : consultations.length === 0 ? (
               <p>No consultation requests at the moment.</p>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {consultations.map((consultation) => (
-                  <div key={consultation.id} className="bg-white p-4 shadow-md rounded-lg">
+                  <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg transition-all hover:shadow-xl">
                     <p><strong>Doctor:</strong> {consultation.Doctor.name}</p>
                     <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
                     <p><strong>Status:</strong> {consultation.status}</p>
-                   
                   </div>
                 ))}
               </div>
@@ -155,40 +141,39 @@ try {
             ) : consultations.length === 0 ? (
               <p>No consultation requests at the moment.</p>
             ) : (
-              <div className="grid grid-cols-1 gap-4">
-              {consultations.map((consultation) => (
-                <div key={consultation.id} className="bg-white p-4 shadow-md rounded-lg flex justify-between items-start">
-                  {/* Left side (Patient data) */}
-                  <div className="w-2/3">
-                    <p><strong>Patient:</strong> {consultation.Patient.name} ({consultation.Patient.email})</p>
-                    <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
-                    <p><strong>Status:</strong> {consultation.status}</p>
-                    <p><strong>Appointment:</strong> {consultation.availability}</p>
-                    <p><strong>Reason :</strong>{consultation.reason}</p>
-                    <p><strong>Description : </strong>{consultation.description}</p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {consultations.map((consultation) => (
+                  <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg flex justify-between items-start transition-all hover:shadow-xl">
+                    {/* Left side (Patient data) */}
+                    <div className="w-2/3">
+                      <p><strong>Patient:</strong> {consultation.Patient.name} ({consultation.Patient.email})</p>
+                      <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
+                      <p><strong>Status:</strong> {consultation.status}</p>
+                      <p><strong>Appointment:</strong> {consultation.availability}</p>
+                      <p><strong>Reason:</strong> {consultation.reason}</p>
+                      <p><strong>Description:</strong> {consultation.description}</p>
             
-                    {/* Update Status Button */}
-                    <button
-                      className="bg-green-600 text-white py-1 px-3 mt-4 rounded-lg hover:bg-green-700 transition duration-300"
-                      onClick={() => handleStatusUpdateClick(consultation.id)}
-                    >
-                      Update Status
-                    </button>
+                      {/* Update Status Button */}
+                      <button
+                        className="bg-green-600 text-white py-2 px-4 mt-4 rounded-lg hover:bg-green-700 transition duration-300"
+                        onClick={() => handleStatusUpdateClick(consultation.id)}
+                      >
+                        Update Status
+                      </button>
+                    </div>
+            
+                    {/* Right side (Image) */}
+                    <div className="w-1/3 bg-gray-100 p-2 rounded-lg">
+                      <p className="mb-2 text-center font-semibold">Image:</p>
+                      <img
+                        src={`http://localhost:3031/${consultation.skinImage}`}
+                        alt="Consultation Image"
+                        className="w-full h-40 object-cover rounded-lg"
+                      />
+                    </div>
                   </div>
-            
-                  {/* Right side (Image) */}
-                  <div className="w-1/3 bg-slate-100 p-2 rounded-lg">
-                    <p className="mb-2 text-center font-semibold">Image:</p>
-                    <img
-                      src={`http://localhost:3030/${consultation.skinImage}`}
-                      alt="Consultation Image"
-                      className="w-full h-auto rounded"
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-            
+                ))}
+              </div>
             )}
           </div>
         )}

@@ -3,7 +3,7 @@ import React from 'react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-800 text-white py-6 mt-auto">
+    <footer className="bg-gray-700 text-white py-6 mt-auto"> {/* Changed background to bg-gray-700 for distinction */}
       <div className="container mx-auto flex justify-between items-center">
         <div className="text-lg font-semibold">© 2024 Skincare Consult</div>
         <div className="space-x-4">

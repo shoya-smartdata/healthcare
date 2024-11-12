@@ -30,7 +30,7 @@ const ConsultationRequestForm = ({ doctorId, onClose }) => {
     formData.append('description', description);
 
     try {
-      const response = await axios.post(`http://localhost:3030/api/patient/consultation`, formData, {
+      const response = await axios.post(`http://localhost:3031/api/patient/consultation`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
           Authorization: `Bearer ${localStorage.getItem('token')}`

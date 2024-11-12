@@ -27,6 +27,8 @@ const StatusUpdateModal = ({ consultationId, onClose, onSubmit }) => {
               <option value="Completed">Completed</option>
               <option value="In Progress">In Progress</option>
               <option value="Cancelled">Cancelled</option>
+              <option value="Cancelled">Accepted</option>
+              
             </select>
             <label> set Appoiment  </label>
             <input type='time' placeholder='updated time !'/>

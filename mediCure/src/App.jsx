@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import VerifyEmailSuccess from './pages/VerifyEmailSuccess';
+import AccountCreated from './pages/AccountCreated';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-mail" element={<AccountCreated />} />
           <Route path="/verify" element={<VerifyEmailSuccess />} />
           <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
