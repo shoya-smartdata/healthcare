@@ -2,11 +2,11 @@ import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
 import Patient from './patientSchema.js';
 import Doctor from './doctorSchema.js';
-import { type } from 'os';
+
 
 const Consultation = sequelize.define('Consultation', {
   status: {
-    type: DataTypes.ENUM('Accepted', 'Confirmed', 'Completed', 'Pending'),
+    type: DataTypes.ENUM('Accepted', 'In Progress', 'Completed', 'Pending', 'Cancelled'),
     defaultValue: 'Pending',
   },
   timeSlot: {

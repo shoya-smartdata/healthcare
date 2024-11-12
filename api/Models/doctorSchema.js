@@ -1,9 +1,7 @@
 
 import { DataTypes } from 'sequelize';
 import sequelize from '../config/db.js';
-
 const Doctor = sequelize.define('Doctor', {
-  
   name: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -15,7 +13,6 @@ const Doctor = sequelize.define('Doctor', {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -26,12 +23,20 @@ const Doctor = sequelize.define('Doctor', {
   },
   verified: {
     type: DataTypes.BOOLEAN,
-    defaultValue: false // Default to false when registering
+    defaultValue: false,
   },
   verificationToken: {
     type: DataTypes.STRING,
-    allowNull: true // Token will be set when generating verification email
-  }
+    allowNull: true,
+  },
+ 
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['email'],
+    },
+  ],
 });
 
 export default Doctor;

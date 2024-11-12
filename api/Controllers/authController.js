@@ -1,116 +1,134 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import Doctor from '../Models/doctorSchema.js';
-import Patient from '../Models/patientSchema.js';
-import Mailer from '../utils/Mailer.js'
-
-
-
-// Register (Doctor/Patient)
-// Additional imports
-import crypto from 'crypto';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import Doctor from "../Models/doctorSchema.js";
+import Patient from "../Models/patientSchema.js";
+import Mailer from "../utils/Mailer.js";
+import crypto from "crypto";
 
 // Register (Doctor/Patient)
 export const register = async (req, res) => {
   const { name, email, password, role, specialization } = req.body;
 
   try {
-    const checkAlreadyUser = await Patient.findOne({ where: { email } });
+    const checkAlreadyUser =
+      (await Patient.findOne({ where: { email } })) ||
+      (await Doctor.findOne({ where: { email } }));
     if (checkAlreadyUser) {
       return res.status(400).json({ message: "Email already exists!" });
     }
-    
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const verificationToken = crypto.randomBytes(32).toString("hex"); // Generate verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    // const tokenExpiry = Date.now() + 3000 * 1000; // Token valid for 3000 seconds (50 minutes)
 
     // Save the user to the database with unverified status
     let user;
-    if (role === 'doctor') {
+    if (role === "doctor") {
       user = await Doctor.create({
         name,
         email,
         specialization,
         password: hashedPassword,
-        verified: false,  // Mark as unverified initially
-        verificationToken
+        verified: false,
+        verificationToken,
+        // tokenExpiry // Store token expiry
       });
     } else {
       user = await Patient.create({
         name,
         email,
         password: hashedPassword,
-        verified: false,  // Mark as unverified initially
-        verificationToken
+        verified: false,
+        verificationToken,
+        // tokenExpiry // Store token expiry
       });
     }
 
     // Send verification email
     const verificationLink = `${process.env.CLIENT_URL}/verify?token=${verificationToken}&email=${email}`;
-    await Mailer(email, "Email Verification", `<p>Please verify your email by clicking the link: <a href="${verificationLink}">Verify Email</a></p>`);
+    await Mailer(
+      email,
+      "Email Verification",
+      `<p>Please verify your email by clicking the link: <a href="${verificationLink}">Verify Email</a></p>`
+    );
 
-    res.status(201).json({ message: 'Registration successful. Please verify your email to log in.', user });
+    res
+      .status(201)
+      .json({
+        message: "Registration successful. Please verify your email to log in.",
+        user,
+      });
   } catch (err) {
-    res.status(500).json({ error: 'Registration failed', details: err });
+    console.error("Registration error:", err);
+    res.status(500).json({ error: "Registration failed", details: err });
   }
 };
 
-
-
 // Verify Email
-// Verify Email Function in the Backend
-
 export const verifyEmail = async (req, res) => {
   const { token, email } = req.query;
 
+  console.log("Received token:", token);
+  console.log("Received email:", email);
+
+  if (!token || !email) {
+    return res.status(400).json({ message: "Missing token or email." });
+  }
+
   try {
-    // Look for user by email and verification token
-    const user = await Patient.findOne({ where: { email, verificationToken: token } })
-              || await Doctor.findOne({ where: { email, verificationToken: token } });
+    let user =
+      (await Patient.findOne({ where: { email, verificationToken: token } })) ||
+      (await Doctor.findOne({ where: { email, verificationToken: token } }));
 
     if (!user) {
-      return res.status(400).json({ message: "Invalid or expired token." });
+      return res.status(400).json({ message: "Invalid or expired verification token." });
     }
 
-    // Update the user’s verification status and clear the token
     await user.update({
       verified: true,
       verificationToken: null,
     });
 
-    res.status(200).json({ message: "Email verified successfully." });
+    console.log("User verified successfully");
+
+    res.status(200).json({ success: true, message: "Email verified successfully." });
   } catch (err) {
     console.error("Error during verification:", err);
-    res.status(500).json({ error: "Verification failed", details: err });
+    res.status(500).json({ error: "Verification failed", details: err.message });
   }
 };
 
 
 
-// dono ke lie same 
+// Login (Doctor/Patient)
 export const login = async (req, res) => {
   const { email, password, role } = req.body;
 
   try {
-   
-    const user = role === 'doctor' 
-      ? await Doctor.findOne({ where: { email } }) 
-      : await Patient.findOne({ where: {email} });
+    const user =
+      role === "doctor"
+        ? await Doctor.findOne({ where: { email } })
+        : await Patient.findOne({ where: { email } });
 
-    if (!user) return res.status(400).json({ message: 'Invalid entry' });
-    if (!user.verified) return res.status(403).json({ message: 'Please verify your email before logging in.' });
+    if (!user) return res.status(400).json({ message: "Invalid entry" });
+    if (!user.verified)
+      return res
+        .status(403)
+        .json({ message: "Please verify your email before logging in." });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid entry' });
+    if (!isMatch) return res.status(400).json({ message: "Invalid entry" });
 
-    const token = jwt.sign({ id: user.id, role }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id, role }, process.env.JWT_SECRET, {
+      expiresIn: "1h",
+    });
 
     res.json({
       message: "User logged in successfully",
-      token
+      token,
     });
   } catch (err) {
-    res.status(500).json({ error: 'Login failed', details: err });
+    console.error("Login error:", err);
+    res.status(500).json({ error: "Login failed", details: err });
   }
 };
-

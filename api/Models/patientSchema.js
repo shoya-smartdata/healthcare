@@ -24,6 +24,17 @@ const Patient = sequelize.define('Patient', {
     type: DataTypes.STRING,
     allowNull: true // Token will be set when generating verification email
   }
+  // tokenExpiry: {
+  //   type: DataTypes.STRING,
+  //   allowNull: true 
+  // }
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['email'],
+    },
+  ],
 });
 
 export default Patient;
