@@ -15,16 +15,16 @@ export const viewRequests = async (req, res) => {
     res.status(500).json({ error: 'Failed to load consultation requests', err });
   }
 };
-
 // Update consultation status
 export const updateStatus = async (req, res) => {
-  const { consultationId, status } = req.body;
+  const { consultationId, status  } = req.body;
 
   try {
     const consultation = await Consultation.findByPk(consultationId);
     if (!consultation) return res.status(404).json({ message: 'Consultation not found' });
 
     consultation.status = status;
+    
     await consultation.save();
 
     res.json({ message: 'Consultation updated', consultation });

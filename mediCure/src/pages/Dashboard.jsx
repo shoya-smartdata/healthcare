@@ -36,7 +36,10 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
+      console.log("data" , response.data);
       setConsultations(response.data.consultations);
+   
+      
     } catch (err) {
       setError('Failed to load consultation requests');
       console.error(err);
@@ -149,7 +152,7 @@ const Dashboard = () => {
                       <p><strong>Patient:</strong> {consultation.Patient.name} ({consultation.Patient.email})</p>
                       <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
                       <p><strong>Status:</strong> {consultation.status}</p>
-                      <p><strong>Appointment:</strong> {consultation.availability}</p>
+                      <p><strong>Appointment:</strong> {consultation.appointment}</p>
                       <p><strong>Reason:</strong> {consultation.reason}</p>
                       <p><strong>Description:</strong> {consultation.description}</p>
             

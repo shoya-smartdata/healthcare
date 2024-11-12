@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 
 const StatusUpdateModal = ({ consultationId, onClose, onSubmit }) => {
   const [status, setStatus] = useState('');
+  const [appointment, setAppointment]= useState('appointment will be updated bu doctor !');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -31,7 +32,12 @@ const StatusUpdateModal = ({ consultationId, onClose, onSubmit }) => {
               
             </select>
             <label> set Appoiment  </label>
-            <input type='time' placeholder='updated time !'/>
+            <input 
+            type='time'
+            value={appointment}
+            onChange={(e)=> setAppointment(e.target.value)}
+            placeholder='updated time !'/>
+          
           </div>
           <div className="flex justify-end">
             <button type="button" className="bg-gray-300 text-gray-700 py-2 px-4 rounded-lg mr-2" onClick={onClose}>Cancel</button>
