@@ -4,7 +4,7 @@ import path from "path";
 // Setup multer storage engine for saving uploaded files
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/"); // Folder to save uploaded images
+    cb(null, "drimages/"); // Folder to save uploaded images
   },
   filename: (req, file, cb) => {
     cb(null, Date.now() + path.extname(file.originalname)); // Rename the file with timestamp
@@ -20,7 +20,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-// Export upload middleware that supports multiple files with .array()
-const upload = multer({ storage, fileFilter });
+const druploads = multer({ storage, fileFilter });
 
-export default upload;
+export default druploads;

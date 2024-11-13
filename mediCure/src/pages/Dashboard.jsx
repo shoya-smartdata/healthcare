@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
 import StatusUpdateModal from '../components/StatusUpdateModal';
 
 const Dashboard = () => {
@@ -15,7 +14,6 @@ const Dashboard = () => {
   const [error, setError] = useState('');
   const [selectedConsultationId, setSelectedConsultationId] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [availability, setAvailability] = useState(''); // Rest
 
   useEffect(() => {
     console.log('Current role:', role);
@@ -24,7 +22,7 @@ const Dashboard = () => {
     } else if (role === 'patient') {
       fetchPatientConsultations();
     }
-  }, [role]);  
+  }, [role]);
 
   const fetchDoctorConsultations = async () => {
     setLoading(true);
@@ -36,10 +34,8 @@ const Dashboard = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("data" , response.data);
+      console.log("Consultations for doctor:", response);
       setConsultations(response.data.consultations);
-   
-      
     } catch (err) {
       setError('Failed to load consultation requests');
       console.error(err);
@@ -53,14 +49,12 @@ const Dashboard = () => {
     setError('');
     try {
       const token = localStorage.getItem('token');
-    
       const response = await axios.get('http://localhost:3031/api/patient/allConstultant', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response);
-      
+      console.log("Consultations for patient:", response);
       setConsultations(response.data.consultations);
     } catch (err) {
       setError('Failed to load consultations');
@@ -105,11 +99,9 @@ const Dashboard = () => {
     }
   };
 
-  console.log("hello", consultations);
-
   return (
     <>
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-6">
         <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
 
         {/* Conditional rendering based on role */}
@@ -128,7 +120,7 @@ const Dashboard = () => {
                   <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg transition-all hover:shadow-xl">
                     <p><strong>Doctor:</strong> {consultation.Doctor.name}</p>
                     <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
-                    <p><strong>Status:</strong> {consultation.status}</p>
+                    <p><strong>Status:</strong> {consultation.status}</p> {/* Patient can see status */}
                   </div>
                 ))}
               </div>
@@ -144,18 +136,18 @@ const Dashboard = () => {
             ) : consultations.length === 0 ? (
               <p>No consultation requests at the moment.</p>
             ) : (
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-6">
                 {consultations.map((consultation) => (
-                  <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg flex justify-between items-start transition-all hover:shadow-xl">
-                    {/* Left side (Patient data) */}
-                    <div className="w-2/3">
+                  <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg transition-all hover:shadow-xl flex flex-col md:flex-row">
+                    {/* Left side: Details (40% width) */}
+                    <div className="md:w-2/5 p-4">
                       <p><strong>Patient:</strong> {consultation.Patient.name} ({consultation.Patient.email})</p>
                       <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
                       <p><strong>Status:</strong> {consultation.status}</p>
                       <p><strong>Appointment:</strong> {consultation.appointment}</p>
                       <p><strong>Reason:</strong> {consultation.reason}</p>
                       <p><strong>Description:</strong> {consultation.description}</p>
-            
+
                       {/* Update Status Button */}
                       <button
                         className="bg-green-600 text-white py-2 px-4 mt-4 rounded-lg hover:bg-green-700 transition duration-300"
@@ -164,15 +156,33 @@ const Dashboard = () => {
                         Update Status
                       </button>
                     </div>
-            
-                    {/* Right side (Image) */}
-                    <div className="w-1/3 bg-gray-100 p-2 rounded-lg">
-                      <p className="mb-2 text-center font-semibold">Image:</p>
-                      <img
-                        src={`http://localhost:3031/${consultation.skinImage}`}
-                        alt="Consultation Image"
-                        className="w-full h-40 object-cover rounded-lg"
-                      />
+
+                    {/* Right side: Image gallery (60% width) */}
+                    <div className="md:w-3/5 p-4 flex flex-wrap gap-4 justify-center">
+                      {consultation.skinImage ? (
+                        (() => {
+                          try {
+                            const images = JSON.parse(consultation.skinImage);
+                            if (Array.isArray(images) && images.length > 0) {
+                              return images.map((imagePath, index) => (
+                                <img
+                                  key={index}
+                                  src={`http://localhost:3031/${imagePath}`}
+                                  alt={`Consultation Image ${index + 1}`}
+                                  className="w-full md:w-48 h-48 object-cover rounded-lg"
+                                />
+                              ));
+                            } else {
+                              return <p className="text-gray-500">No images available</p>;
+                            }
+                          } catch (error) {
+                            console.error('Error parsing images:', error);
+                            return <p className="text-red-500">Error displaying images</p>;
+                          }
+                        })()
+                      ) : (
+                        <p className="text-gray-500">No images available</p>
+                      )}
                     </div>
                   </div>
                 ))}

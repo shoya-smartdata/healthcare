@@ -22,7 +22,7 @@ const Consultation = sequelize.define('Consultation', {
     allowNull: false
   },
   skinImage: {
-    type: DataTypes.STRING,
+    type: DataTypes.JSON,
     allowNull: false,
   },
 }, {

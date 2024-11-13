@@ -1,94 +1,90 @@
 import Consultation from '../Models/consultationSchema.js';
 import Doctor from '../Models/doctorSchema.js';
 
-
-export const doctorData = async (req, res)=>{
-   
+// Fetch all doctors
+export const doctorData = async (req, res) => {
    try {
+      const data = await Doctor.findAll();
 
-    const data = await Doctor.findAll();
-
-    res.status(201).json({
-      message: "dr fetched successfully !",
-      data
-    })
-    
+      res.status(201).json({
+        message: "Doctors fetched successfully!",
+        data
+      });
    } catch (error) {
-    res.status(400).json({
-      error: "unablle to get data !"
-    })
-   } 
+      res.status(400).json({
+        error: "Unable to get doctor data!"
+      });
+   }
 }
 
-
-// Request a Consultation
+// Request a Consultation (with multiple file uploads)
 export const requestConsultation = async (req, res) => {
-  const { doctorId, timeSlot, reason,description } = req.body;
-  const patientId = req.user.id; 
+  const { doctorId, timeSlot, reason, description } = req.body;
+  const patientId = req.user.id;
 
   try {
-      if (!req.file) {
-          return res.status(400).json({ error: 'Please upload skin problem.' });
-      }
+    // Ensure that at least one file is uploaded
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ error: 'Please upload at least one skin problem image.' });
+    }
 
-      if (!doctorId || !timeSlot) {
-          return res.status(400).json({ error: 'Doctor slot required' });
-      }
+    // Ensure that necessary fields are provided
+    if (!doctorId || !timeSlot || !reason) {
+      return res.status(400).json({ error: 'Doctor ID, time slot, and reason are required.' });
+    }
 
-      const consultation = await Consultation.create({
-          DoctorId: doctorId, 
-          PatientId: patientId, 
-          timeSlot,
-          reason,
-          description,
-          skinImage: req.file.path,
-      });
+    // Prepare the file paths to store in the consultation record
+    const skinImages = req.files.map(file => file.path);
 
-  
+    // Create a new consultation record
+    const consultation = await Consultation.create({
+      DoctorId: doctorId,
+      PatientId: patientId,
+      timeSlot,
+      reason,
+      description,
+      skinImage: skinImages,  // Store an array of image paths
+    });
 
-      res.status(201).json({ consultation });
+    res.status(201).json({
+      message: 'Consultation request submitted successfully!',
+      consultation
+    });
   } catch (err) {
-      console.error('Error details:', err);
-      res.status(500).json({ error: 'Request failed', details: err.message });
+    console.error('Error details:', err);
+    res.status(500).json({ error: 'Request failed', details: err.message });
   }
 };
 
-  
-
+// Track the status of a consultation
 export const trackStatus = async (req, res) => {
   const { consultationId } = req.params;
 
   try {
     const consultation = await Consultation.findByPk(consultationId);
 
-  
-    console.log('Consultation:', consultation);
-
     if (!consultation) {
       return res.status(404).json({ message: 'Consultation not found' });
     }
 
-
     res.json({ status: consultation.status });
   } catch (err) {
-    console.error('Tracking error:', err); 
+    console.error('Tracking error:', err);
     res.status(500).json({ error: 'Tracking failed!', details: err.message });
   }
 };
 
-
-//get all consultant 
-
-
+// Get all consultations for a patient
 export const getPatientConsultations = async (req, res) => {
-  const patientId = req.user.id; 
+  const patientId = req.user.id;
+
   try {
     const consultations = await Consultation.findAll({
       where: { PatientId: patientId },
       include: [
         {
           model: Doctor,
-          attributes: ['name', 'availability'],  // Fetch only the name field of the doctor
+          attributes: ['name', 'availability'],  // Include the doctor's name and availability
         },
       ]
     });

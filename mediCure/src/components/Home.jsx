@@ -1,8 +1,6 @@
-// pages/Home.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import Card from '../components/Card';
-
 import ConsultationRequestForm from '../pages/ConsultationRequestForm';
 
 const Home = () => {
@@ -17,7 +15,6 @@ const Home = () => {
         const response = await axios.get('http://localhost:3031/api/patient/doctors');
         setDoctors(response.data.data);
         console.log(response.data.data);
-        
       } catch (error) {
         console.error('Error fetching doctor data:', error);
       }
@@ -37,26 +34,42 @@ const Home = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-4 text-center">Welcome to Skincare Consult</h1>
-      <p className="text-center mb-8">
-        Consult with our expert dermatologists for all your skincare needs.
-      </p>
-
-      {/* Display doctor data */}
-      {doctors.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {doctors.map(doctor => (
-            <Card 
-              key={doctor.id} 
-              doctor={doctor} 
-              onBookAppointment={handleBookAppointment} // Pass the handler to Card
-            />
-          ))}
+    <div className="min-h-screen bg-gradient-to-r from-blue-500 to-teal-400 bg-cover bg-fixed relative">
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black opacity-50"></div> 
+      
+      <div className="relative container mx-auto px-4 py-12 text-white z-10">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          <h1 className="text-5xl font-extrabold animate__animated animate__fadeIn animate__delay-1s">
+            Welcome to Skincare Consult
+          </h1>
+          <p className="mt-4 text-lg font-light animate__animated animate__fadeIn animate__delay-2s">
+            Consult with our expert dermatologists for all your skincare needs.
+          </p>
+          
         </div>
-      ) : (
-        <p className="text-center">Loading doctors...</p>
-      )}
+
+        {/* Doctors Section */}
+        <h2 className="text-4xl font-semibold text-center text-white mb-8 animate__animated animate__fadeIn animate__delay-3s">
+          Meet Our Doctors
+        </h2>
+        
+        {doctors.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {doctors.map(doctor => (
+              <div key={doctor.id} className="relative cursor-pointer">
+                <Card 
+                  doctor={doctor} 
+                  onBookAppointment={handleBookAppointment} 
+                />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-center text-gray-300">Loading doctors...</p>
+        )}
+      </div>
 
       {/* Show consultation request form if a doctor is selected */}
       {showForm && (

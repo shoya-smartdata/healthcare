@@ -1,12 +1,20 @@
-// components/Navbar.js
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false); // State for mobile menu
+  const navigate = useNavigate();
+
+  const isLoggedIn = localStorage.getItem('token');
+
+  // Logout function
+  const handleLogout = () => {
+    localStorage.removeItem('token'); 
+    navigate('/login');
+  };
 
   return (
-    <nav className="bg-blue-500 shadow-lg  w-full "> {/* Change here */}
+    <nav className="bg-blue-500 shadow-lg w-full">
       <div className="container mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <div className="text-3xl font-extrabold text-white tracking-wide">
@@ -23,22 +31,35 @@ const Navbar = () => {
               Home
             </Link>
           </li>
-          <li>
-            <Link
-              to="/login"
-              className="text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
-            >
-              Login
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/dashboard"
-              className="text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
-            >
-              Dashboard
-            </Link>
-          </li>
+          {isLoggedIn ? (
+            <>
+              <li>
+                <Link
+                  to="/dashboard"
+                  className="text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={handleLogout}
+                  className="text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <Link
+                to="/login"
+                className="text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+              >
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
 
         {/* Hamburger button for mobile */}
@@ -84,7 +105,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <ul className="md:hidden bg-blue-500 px-4 py-4 space-y-4"> {/* Change here */}
+        <ul className="md:hidden bg-blue-500 px-4 py-4 space-y-4">
           <li>
             <Link
               to="/"
@@ -94,24 +115,40 @@ const Navbar = () => {
               Home
             </Link>
           </li>
-          <li>
-            <Link
-              to="/login"
-              onClick={() => setIsOpen(false)}
-              className="block text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
-            >
-              Login
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="block text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
-            >
-              Dashboard
-            </Link>
-          </li>
+          {isLoggedIn ? (
+            <>
+              <li>
+                <Link
+                  to="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="block text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+                >
+                  Dashboard
+                </Link>
+              </li>
+              <li>
+                <button
+                  onClick={() => {
+                    handleLogout();
+                    setIsOpen(false); // Close the menu after logout
+                  }}
+                  className="block text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+                >
+                  Logout
+                </button>
+              </li>
+            </>
+          ) : (
+            <li>
+              <Link
+                to="/login"
+                onClick={() => setIsOpen(false)}
+                className="block text-white text-lg font-medium hover:text-yellow-300 transition duration-300"
+              >
+                Login
+              </Link>
+            </li>
+          )}
         </ul>
       )}
     </nav>

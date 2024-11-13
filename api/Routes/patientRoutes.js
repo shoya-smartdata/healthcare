@@ -6,7 +6,7 @@ import authMiddleware from '../Middleware/authMiddleware.js';
 const router = express.Router();
 
 // counsltant  data 
-router.post('/consultation', authMiddleware, upload.single('skinImage'), requestConsultation);
+router.post('/consultation', authMiddleware, upload.array('skinImage', 5), requestConsultation);
 
 router.get('/doctors',  doctorData);
 router.get('/consultation/:consultationId/status', authMiddleware, trackStatus);

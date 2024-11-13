@@ -8,30 +8,29 @@ import crypto from "crypto";
 // Register (Doctor/Patient)
 export const register = async (req, res) => {
   const { name, email, password, role, specialization } = req.body;
-
+  
   try {
     const checkAlreadyUser =
       (await Patient.findOne({ where: { email } })) ||
       (await Doctor.findOne({ where: { email } }));
+    
     if (checkAlreadyUser) {
       return res.status(400).json({ message: "Email already exists!" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationToken = crypto.randomBytes(32).toString("hex");
-    // const tokenExpiry = Date.now() + 3000 * 1000; // Token valid for 3000 seconds (50 minutes)
 
-    // Save the user to the database with unverified status
     let user;
     if (role === "doctor") {
       user = await Doctor.create({
         name,
         email,
         specialization,
+        drImage: req.file.path, // Saving the file path to the database
         password: hashedPassword,
         verified: false,
         verificationToken,
-        // tokenExpiry // Store token expiry
       });
     } else {
       user = await Patient.create({
@@ -40,11 +39,9 @@ export const register = async (req, res) => {
         password: hashedPassword,
         verified: false,
         verificationToken,
-        // tokenExpiry // Store token expiry
       });
     }
 
-    // Send verification email
     const verificationLink = `${process.env.CLIENT_URL}/verify?token=${verificationToken}&email=${email}`;
     await Mailer(
       email,
@@ -52,12 +49,10 @@ export const register = async (req, res) => {
       `<p>Please verify your email by clicking the link: <a href="${verificationLink}">Verify Email</a></p>`
     );
 
-    res
-      .status(201)
-      .json({
-        message: "Registration successful. Please verify your email to log in.",
-        user,
-      });
+    res.status(201).json({
+      message: "Registration successful. Please verify your email to log in.",
+      user,
+    });
   } catch (err) {
     console.error("Registration error:", err);
     res.status(500).json({ error: "Registration failed", details: err });
@@ -67,9 +62,6 @@ export const register = async (req, res) => {
 // Verify Email
 export const verifyEmail = async (req, res) => {
   const { token, email } = req.query;
-
-  console.log("Received token:", token);
-  console.log("Received email:", email);
 
   if (!token || !email) {
     return res.status(400).json({ message: "Missing token or email." });
@@ -89,16 +81,12 @@ export const verifyEmail = async (req, res) => {
       verificationToken: null,
     });
 
-    console.log("User verified successfully");
-
     res.status(200).json({ success: true, message: "Email verified successfully." });
   } catch (err) {
     console.error("Error during verification:", err);
     res.status(500).json({ error: "Verification failed", details: err.message });
   }
 };
-
-
 
 // Login (Doctor/Patient)
 export const login = async (req, res) => {
@@ -117,18 +105,16 @@ export const login = async (req, res) => {
         .json({ message: "Please verify your email before logging in." });
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid entry" });
+    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = jwt.sign({ id: user.id, role }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
 
-    res.json({
-      message: "User logged in successfully",
-      token,
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: "Login failed", details: err });
+    res.status(200).json({ message: "Logged in successfully", token, user });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

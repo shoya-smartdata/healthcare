@@ -10,6 +10,10 @@ const Doctor = sequelize.define('Doctor', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  drImage: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   email: {
     type: DataTypes.STRING,
     allowNull: false,
