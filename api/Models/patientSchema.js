@@ -38,3 +38,5 @@ const Patient = sequelize.define('Patient', {
 });
 
 export default Patient;
+
+//testing
