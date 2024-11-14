@@ -9,4 +9,5 @@ router.get('/requests', authMiddleware, viewRequests);
 router.put('/consultation/status', authMiddleware, updateStatus);
 router.put('/availability', authMiddleware, updateAvailability);
 
+
 export default router;

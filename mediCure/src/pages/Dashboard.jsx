@@ -74,12 +74,13 @@ const Dashboard = () => {
     setSelectedConsultationId(null);
   };
 
-  const handleUpdateStatus = async (consultationId, newStatus) => {
+  const handleUpdateStatus = async (consultationId, newStatus, newavailability) => {
     try {
       const token = localStorage.getItem('token');
       await axios.put('http://localhost:3031/api/doctor/consultation/status', {
         consultationId,
         status: newStatus,
+        availability: newavailability
       }, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -119,8 +120,9 @@ const Dashboard = () => {
                 {consultations.map((consultation) => (
                   <div key={consultation.id} className="bg-white p-6 shadow-lg rounded-lg transition-all hover:shadow-xl">
                     <p><strong>Doctor:</strong> {consultation.Doctor.name}</p>
-                    <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
-                    <p><strong>Status:</strong> {consultation.status}</p> {/* Patient can see status */}
+                    <p><strong>Request time:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
+                    <p><strong>Status:</strong> {consultation.status}</p>
+                    <p><strong>Your slot:</strong> {consultation.Doctor.availability}</p> {/* Patient can see status */}
                   </div>
                 ))}
               </div>
@@ -142,9 +144,9 @@ const Dashboard = () => {
                     {/* Left side: Details (40% width) */}
                     <div className="md:w-2/5 p-4">
                       <p><strong>Patient:</strong> {consultation.Patient.name} ({consultation.Patient.email})</p>
-                      <p><strong>Time Slot:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
+                      <p><strong>Request Time:</strong> {new Date(consultation.timeSlot).toLocaleString()}</p>
                       <p><strong>Status:</strong> {consultation.status}</p>
-                      <p><strong>Appointment:</strong> {consultation.appointment}</p>
+                      {/* <p><strong>Given slot:</strong> {consultation.availability}</p> */}
                       <p><strong>Reason:</strong> {consultation.reason}</p>
                       <p><strong>Description:</strong> {consultation.description}</p>
 

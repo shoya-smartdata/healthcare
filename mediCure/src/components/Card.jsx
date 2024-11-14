@@ -14,7 +14,7 @@ const Card = ({ doctor, onBookAppointment }) => {
             className="object-cover h-full w-full rounded"
           />
         </div>
-        <h3 className="text-lg font-bold mb-2">{doctor.name}</h3>
+        <h3 className="text-lg text-gray-800 font-bold mb-2">{doctor.name}</h3>
         <p className="text-gray-700">Specialization: {doctor.specialization}</p>
         <p className="text-gray-700">Availability: {doctor.availability}</p>
         {/* Button to book an appointment */}
